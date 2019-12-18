@@ -1,24 +1,68 @@
 import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import * as Font from 'expo-font';
+
+import { createIconSet } from '@expo/vector-icons';
+import { StyleSheet, View, TouchableHighlight } from 'react-native';
+import fontAwesome from '../../assets/fonts/fa-solid-900.ttf';
+
+const CustomIcon = createIconSet({
+  pencil: '\uf303',
+  plus: '\uf067',
+  check: '\uf00c',
+}, 'FontAwesome');
 
 class CircleButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      fontLoaded: false,
+    };
+  }
+
+  async componentDidMount() {
+    await Font.loadAsync({
+      FontAwesome: fontAwesome,
+    });
+
+    this.setState({ fontLoaded: true });
+  }
+
   render() {
+    const { name, style, color, onPress } = this.props;
+
+    let bgColor = '#E31676';
+    let textColor = '#fff';
+
+    if (color === 'white') {
+      bgColor = '#fff';
+      textColor = '#E31676';
+    }
+
     return (
-      <View style={styles.memoAddButton}>
-        <Text style={styles.memoAddButtonTitle}>+</Text>
-      </View>
+      <TouchableHighlight style={[styles.container, style]} onPress={onPress} underlayColor="transparent">
+        <View style={[styles.circleButton, style, { backgroundColor: bgColor }]}>
+          {
+            this.state.fontLoaded ? (
+              <CustomIcon name={name} style={[styles.circleButtonTitle, { color: textColor }]} />
+            ) : null
+          }
+        </View>
+      </TouchableHighlight>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  memoAddButton: {
+  container: {
+    width: 48,
+    height: 48,
     position: 'absolute',
     bottom: 32,
     right: 32,
+  },
+  circleButton: {
     width: 48,
     height: 48,
-    backgroundColor: '#E31676',
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
@@ -27,10 +71,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
-  memoAddButtonTitle: {
-    fontSize: 32,
-    lineHeight: 32,
-    color: '#fff',
+  circleButtonTitle: {
+    fontFamily: 'FontAwesome',
+    fontSize: 24,
+    lineHeight: 24,
   },
 });
 
