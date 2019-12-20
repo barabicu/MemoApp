@@ -1,44 +1,26 @@
 import React from 'react';
 import { StyleSheet, View, TextInput } from 'react-native';
-
 import firebase from 'firebase';
 
 import CircleButton from '../elements/CircleButton';
 
-class MemoEditScreen extends React.Component {
+class MemoCreateScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      body: {},
-      key: {},
+      body: '',
     };
   }
 
-  componentWillMount() {
-    const { params } = this.props.navigation.state;
-    this.setState({
-      body: params.memo.body,
-      key: params.memo.key,
-    });
-  }
-
   handlePress() {
-    const { currentUser } = firebase.auth();
     const db = firebase.firestore();
-    const newDate = firebase.firestore.Timestamp.now();
-    db.collection(`users/${currentUser.uid}/memos`).doc(this.state.key)
-      .update({
-        body: this.state.body,
-        createdOn: newDate,
-      })
+    const { currentUser } = firebase.auth();
+    db.collection(`users/${currentUser.uid}/memos`).add({
+      body: this.state.body,
+      createdOn: new Date(),
+    })
       .then(() => {
-        const { navigation } = this.props;
-        navigation.state.params.returnMemo({
-          body: this.state.body,
-          key: this.state.key,
-          createdOn: newDate,
-        });
-        navigation.goBack();
+        this.props.navigation.goBack();
       })
       .catch(() => {
       });
@@ -48,7 +30,7 @@ class MemoEditScreen extends React.Component {
     return (
       <View style={styles.container}>
         <TextInput
-          style={styles.memoEditInput}
+          style={styles.memoCreateInput}
           multiline
           value={this.state.body}
           onChangeText={(text) => { this.setState({ body: text }); }}
@@ -64,7 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-  memoEditInput: {
+  memoCreateInput: {
     backgroundColor: '#fff',
     flex: 1,
     paddingTop: 32,
@@ -74,4 +56,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MemoEditScreen;
+export default MemoCreateScreen;

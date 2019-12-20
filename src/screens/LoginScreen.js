@@ -1,19 +1,35 @@
 import React from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableHighlight } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableHighlight, TouchableOpacity } from 'react-native';
+import firebase from 'firebase';
+import { StackActions, NavigationActions } from 'react-navigation';
 
 class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      password: '',
+      email: 'user1@abc.com',
+      password: '12345678',
     };
   }
 
   // eslint-disable-next-line
   handleSubmit() {
+    firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+      .then(() => {
+        const resetAction = StackActions.reset({
+          index: 0,
+          actions: [
+            NavigationActions.navigate({ routeName: 'Home' }),
+          ],
+        });
+        this.props.navigation.dispatch(resetAction);
+      })
+      .catch(() => {
+      });
+  }
 
-    // this.props.navigation.navigate('Home')
+  handlePress() {
+    this.props.navigation.navigate('Signup');
   }
 
   render() {
@@ -42,6 +58,10 @@ class LoginScreen extends React.Component {
         <TouchableHighlight style={styles.button} onPress={this.handleSubmit.bind(this)} underlayColor="#C70F66">
           <Text style={styles.buttonTitle}>ログインする</Text>
         </TouchableHighlight>
+
+        <TouchableOpacity style={styles.signup} onPress={this.handlePress.bind(this)}>
+          <Text style={styles.signupText}>メンバー登録する</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -79,6 +99,13 @@ const styles = StyleSheet.create({
   buttonTitle: {
     color: '#fff',
     fontSize: 18,
+  },
+  signup: {
+    marginTop: 16,
+    alignSelf: 'center',
+  },
+  signupText: {
+    fontSize: 16,
   },
 });
 
